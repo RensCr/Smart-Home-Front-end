@@ -1,0 +1,20 @@
+.btn-aan {
+  background-color: #80cfa9;
+  color: white;
+  border: none;
+  margin-right: 10px;
+}
+.btn-uit {
+  background-color: #f28b60;
+  color: white;
+  border: none;
+  margin-right: 10px;
+}
+.btn-slim {
+  background-color: #99cfff;
+  color: white;
+  border: none;
+}
+.card {
+  margin-top: 1rem;
+}
