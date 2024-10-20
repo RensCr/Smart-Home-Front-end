@@ -1,5 +1,11 @@
 import { Link } from "react-router-dom";
-function Header() {
+
+interface HeaderProps {
+  searchQuery: string;
+  setSearchQuery: (query: string) => void;
+}
+
+function Header({ searchQuery, setSearchQuery }: HeaderProps) {
   return (
     <nav className="navbar navbar-expand-lg navbar-light bg-light">
       <div className="container-fluid">
@@ -35,6 +41,8 @@ function Header() {
               type="search"
               placeholder="Zoek apparaat"
               aria-label="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
             />
           </form>
           <div>
