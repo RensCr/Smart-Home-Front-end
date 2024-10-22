@@ -1,0 +1,33 @@
+/* Instellingenbar CSS */
+
+.instellingen-container .no-border-list .list-group-item {
+  border: none; /* Verwijdert de borders tussen de items */
+}
+
+.instellingen-container .list-group-item:hover {
+  color: black;
+}
+
+.instellingen-container .container-fluid {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* Zorgt ervoor dat de container ten minste de volledige hoogte van de viewport inneemt */
+}
+
+.instellingen-container .row {
+  flex: 1; /* Zorgt ervoor dat de inhoud zich vult tot de beschikbare ruimte */
+}
+
+.instellingen-container .list-group {
+  display: flex;
+  flex-direction: column;
+  flex-grow: 1;
+}
+
+.instellingen-container .mt-auto {
+  align-self: flex-end; /* Zorgt ervoor dat de uitlogknop naar de onderkant van de container gaat */
+}
+
+.instellingen-container .uitlogKnop {
+  width: 10%;
+}
