@@ -46,7 +46,7 @@ function SlimmeApparaten() {
         {/* Main content with personal information */}
         <div className="col-md-9">
           <div className="card p-4">
-            <h3 className="card-title">Persoonlijke gegevens</h3>
+            <h3 className="card-title">Slimme Apparaten</h3>
             <div className="form-group mb-3 w-75">
               <label>
                 Slimme apparaten {ApparatenInfo?.beschrijving} (
