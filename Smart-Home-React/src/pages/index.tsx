@@ -8,7 +8,13 @@ import { useNavigate } from "react-router-dom";
 function Index() {
   const navigate = useNavigate();
   const [Apparaten, setApparaattypes] = useState<
-    { id: number; naam: string; slim: boolean; apparaatType: string }[]
+    {
+      id: number;
+      naam: string;
+      slim: boolean;
+      apparaatType: string;
+      status: boolean;
+    }[]
   >([]);
   const [searchQuery, setSearchQuery] = useState("");
 
@@ -84,7 +90,74 @@ function Index() {
       (query === "niet slim" && !apparaat.slim)
     );
   });
+  const VerranderStatus = async (apparaatId: number, status: boolean) => {
+    try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("jwtToken="))
+        ?.split("=")[1];
 
+      if (!token) {
+        console.error("JWT token not found in cookies");
+        return;
+      }
+
+      const response = await fetch(
+        `https://localhost:7032/Apparaat/verranderStatus`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ apparaatId, status }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to update apparaat status");
+        return;
+      }
+
+      fetchApparaten(); // Refresh apparaten list after updating the status
+    } catch (error) {
+      console.error("Error updating apparaat status:", error);
+    }
+  };
+  const VerranderSlim = async (apparaatId: number, status: boolean) => {
+    try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("jwtToken="))
+        ?.split("=")[1];
+
+      if (!token) {
+        console.error("JWT token not found in cookies");
+        return;
+      }
+
+      const response = await fetch(
+        `https://localhost:7032/Apparaat/verranderSlim`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ apparaatId, status }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to update apparaat status");
+        return;
+      }
+
+      fetchApparaten(); // Refresh apparaten list after updating the status
+    } catch (error) {
+      console.error("Error updating apparaat status:", error);
+    }
+  };
   return (
     <>
       <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
@@ -99,15 +172,29 @@ function Index() {
                   </h5>
                   <p className="card-text">
                     {apparaat.slim ? "Slim" : "Niet slim"}
+                    <br />
+                    {apparaat.status ? "status - Aan" : "status - Uit"}
                   </p>
                   <br />
-                  <a href="#" className="btn btn-aan">
+                  <a
+                    href="#"
+                    className="btn btn-aan"
+                    onClick={() => VerranderStatus(apparaat.id, true)}
+                  >
                     Aan
                   </a>
-                  <a href="#" className="btn btn-uit">
+                  <a
+                    href="#"
+                    className="btn btn-uit"
+                    onClick={() => VerranderStatus(apparaat.id, false)}
+                  >
                     Uit
                   </a>
-                  <a href="#" className="btn btn-slim">
+                  <a
+                    href="#"
+                    className="btn btn-slim"
+                    onClick={() => VerranderSlim(apparaat.id, !apparaat.slim)}
+                  >
                     Slim
                   </a>
                 </div>
