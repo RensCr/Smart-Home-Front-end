@@ -7,6 +7,7 @@ import Aanmaak from "./pages/Accountaanmaak";
 import Huizen from "./pages/Huizen";
 import Account from "./pages/Account";
 import SlimmeApparaten from "./pages/SlimmeApparaten";
+import Plattegrond from "./pages/Plattegrond";
 
 function App() {
   return (
@@ -19,6 +20,7 @@ function App() {
         <Route path="/Huizen" element={<Huizen />} />
         <Route path="/Account" element={<Account />} />
         <Route path="/Slimmeapparaten" element={<SlimmeApparaten />} />
+        <Route path="/Plattegrond" element={<Plattegrond />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
