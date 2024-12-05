@@ -1,0 +1,34 @@
+[
+  {
+    "id": 9,
+    "naam": "WandLamp",
+    "slim": false,
+    "apparaatType": "Tv",
+    "huisId": 5,
+    "status": true
+  },
+  {
+    "id": 10,
+    "naam": "TestLampHuis5",
+    "slim": true,
+    "apparaatType": "Lamp",
+    "huisId": 5,
+    "status": false
+  },
+  {
+    "id": 17,
+    "naam": "LampTest",
+    "slim": true,
+    "apparaatType": "Rolluik",
+    "huisId": 5,
+    "status": false
+  },
+  {
+    "id": 25,
+    "naam": "Lamp slaapkamer jantje",
+    "slim": true,
+    "apparaatType": "Lamp",
+    "huisId": 5,
+    "status": false
+  }
+]

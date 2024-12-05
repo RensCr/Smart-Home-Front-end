@@ -36,9 +36,6 @@ function Index() {
         console.log("jwtToken cookie not found, redirecting to login");
         navigate("/inloggen");
       }
-      if (localStorage.getItem("GeselecteerdeWoningsID") === null) {
-        navigate("/huizen");
-      }
     };
 
     checkJwtToken();
