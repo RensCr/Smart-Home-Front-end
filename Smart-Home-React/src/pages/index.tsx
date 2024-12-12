@@ -1,22 +1,18 @@
-import "../App.css";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useWebSocket } from "../Websocket/websocketcontext.jsx";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import "../Css/Home.css";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Index() {
   const navigate = useNavigate();
-  const [Apparaten, setApparaattypes] = useState<
-    {
-      id: number;
-      naam: string;
-      slim: boolean;
-      apparaatType: string;
-      status: boolean;
-    }[]
-  >([]);
+  const { messages, sendMessage, connectUser, currentUser } = useWebSocket();
+  const [Apparaten, setApparaattypes] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [username, setUsername] = useState("User");
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     const checkJwtToken = () => {
@@ -26,12 +22,6 @@ function Index() {
       );
       if (jwtTokenCookie) {
         console.log("jwtToken cookie found");
-        const isSecure = jwtTokenCookie.includes("Secure");
-        if (isSecure) {
-          console.log("jwtToken cookie is secure");
-        } else {
-          console.log("jwtToken cookie is not secure");
-        }
       } else {
         console.log("jwtToken cookie not found, redirecting to login");
         navigate("/inloggen");
@@ -87,77 +77,29 @@ function Index() {
       (query === "niet slim" && !apparaat.slim)
     );
   });
-  const VerranderStatus = async (apparaatId: number, status: boolean) => {
-    try {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("jwtToken="))
-        ?.split("=")[1];
 
-      if (!token) {
-        console.error("JWT token not found in cookies");
-        return;
-      }
-
-      const response = await fetch(
-        `https://localhost:7032/Apparaat/verranderStatus`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ apparaatId, status }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error("Failed to update apparaat status");
-        return;
-      }
-
-      fetchApparaten(); // Refresh apparaten list after updating the status
-    } catch (error) {
-      console.error("Error updating apparaat status:", error);
+  const toggleChatWindow = () => {
+    setIsChatOpen(!isChatOpen);
+    if (!isChatOpen) {
+      connectUser({ username, userId });
     }
   };
-  const VerranderSlim = async (apparaatId: number, status: boolean) => {
-    try {
-      const token = document.cookie
-        .split("; ")
-        .find((row) => row.startsWith("jwtToken="))
-        ?.split("=")[1];
 
-      if (!token) {
-        console.error("JWT token not found in cookies");
-        return;
-      }
-
-      const response = await fetch(
-        `https://localhost:7032/Apparaat/verranderSlim`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ apparaatId, status }),
-        }
-      );
-
-      if (!response.ok) {
-        console.error("Failed to update apparaat status");
-        return;
-      }
-
-      fetchApparaten(); // Refresh apparaten list after updating the status
-    } catch (error) {
-      console.error("Error updating apparaat status:", error);
+  const handleSendMessage = () => {
+    if (newMessage.trim()) {
+      sendMessage(newMessage, "manager");
+      setNewMessage("");
     }
   };
+
   return (
     <>
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setUsername={setUsername}
+        setUserId={setUserId}
+      />
       <div className="container-fluid">
         <div className="row">
           {filteredApparaten.map((apparaat) => (
@@ -200,6 +142,93 @@ function Index() {
           ))}
         </div>
       </div>
+
+      <div
+        className="chat-bubble"
+        onClick={toggleChatWindow}
+        style={{
+          position: "fixed",
+          bottom: "70px",
+          right: "20px",
+          backgroundColor: "#007bff",
+          color: "white",
+          borderRadius: "50%",
+          padding: "15px",
+          cursor: "pointer",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          fontSize: "20px",
+        }}
+      >
+        💬
+      </div>
+
+      {isChatOpen && (
+        <div
+          className="chat-window"
+          style={{
+            position: "fixed",
+            bottom: "100px",
+            right: "20px",
+            width: "300px",
+            height: "400px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+            padding: "10px",
+            zIndex: 1000,
+          }}
+        >
+          <h5>Chat</h5>
+          <div
+            className="chat-content"
+            style={{
+              height: "300px",
+              overflowY: "scroll",
+              borderBottom: "1px solid #ccc",
+            }}
+          >
+            {messages.map(
+              (
+                message: { user: string; recipientId: string; text: string },
+                index: number
+              ) => (
+                <div
+                  key={index}
+                  className={`message ${
+                    message.user === userId ? "left" : "right"
+                  }`}
+                >
+                  {message.text}
+                </div>
+              )
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              style={{ width: "100%", padding: "5px" }}
+            />
+            <button
+              onClick={handleSendMessage}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                padding: "5px",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+              }}
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );

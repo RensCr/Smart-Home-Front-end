@@ -51,3 +51,19 @@ body {
   color: #007bff;
   text-decoration: none;
 }
+
+.message-left {
+  text-align: left;
+  background-color: #e1ffc7;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px 0;
+}
+
+.message-right {
+  text-align: right;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 10px;
+  margin: 5px 0;
+}
