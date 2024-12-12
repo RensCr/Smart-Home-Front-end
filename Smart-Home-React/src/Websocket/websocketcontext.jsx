@@ -30,16 +30,23 @@ export const WebSocketProvider = ({ children }) => {
         .then(() => {
           console.log("Connected to SignalR");
 
-          connection.on("ReceiveMessage", (userId, chatMessage) => {
-            console.log("ReceiveMessage", userId, chatMessage);
-            setMessages((prevMessages) => {
-              console.log("1", prevMessages);
-              return [
-                ...prevMessages,
-                { user: userId, text: chatMessage, recipientId: 0 },
-              ];
-            });
-          });
+          connection.on(
+            "ReceiveMessage",
+            (userId, chatMessage, targetIdString) => {
+              console.log("ReceiveMessage", userId, chatMessage);
+              setMessages((prevMessages) => {
+                console.log("1", prevMessages);
+                return [
+                  ...prevMessages,
+                  {
+                    user: userId,
+                    text: chatMessage,
+                    recipientId: targetIdString,
+                  },
+                ];
+              });
+            }
+          );
 
           connection.on("SendToGroup", (user) => {
             setUsers((prevUsers) => {
@@ -68,6 +75,7 @@ export const WebSocketProvider = ({ children }) => {
   }, [connection]);
 
   const sendMessage = (message, recipientId) => {
+    console.log("sendMessage", message, recipientId);
     if (connection && connection.state === "Connected") {
       connection
         .invoke(

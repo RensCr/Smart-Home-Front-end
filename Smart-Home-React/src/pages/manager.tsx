@@ -82,30 +82,30 @@ const Helpdesk = () => {
             }}
           >
             {messages
-              // .filter(
-              //   (message: {
-              //     user: string;
-              //     recipientId: string;
-              //     text: string;
-              //   }) => {
-              //     const isSelectedUser =
-              //       message.recipientId.toString() ===
-              //         selectedUserId.toString() ||
-              //       message.user.toString() === selectedUserId.toString() ||
-              //       (message.user.toString() === "1" &&
-              //         message.recipientId.toString() ===
-              //           selectedUserId.toString());
-              //     console.log(
-              //       "Message:",
-              //       message,
-              //       "Selected user ID:",
-              //       selectedUserId,
-              //       "Is selected user:",
-              //       isSelectedUser
-              //     );
-              //     return isSelectedUser;
-              //   }
-              // )
+              .filter(
+                (message: {
+                  user: string;
+                  recipientId: string;
+                  text: string;
+                }) => {
+                  const isSelectedUser =
+                    message.recipientId.toString() ===
+                      selectedUserId.toString() ||
+                    message.user.toString() === selectedUserId.toString() ||
+                    (message.user.toString() === "1" &&
+                      message.recipientId.toString() ===
+                        selectedUserId.toString());
+                  console.log(
+                    "Message:",
+                    message,
+                    "Selected user ID:",
+                    selectedUserId,
+                    "Is selected user:",
+                    isSelectedUser
+                  );
+                  return isSelectedUser;
+                }
+              )
               .map(
                 (
                   message: { user: string; recipientId: string; text: string },
