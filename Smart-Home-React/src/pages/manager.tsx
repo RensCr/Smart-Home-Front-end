@@ -106,16 +106,37 @@ const Helpdesk = () => {
                   return isSelectedUser;
                 }
               )
-              .map(
-                (
-                  message: { user: string; recipientId: string; text: string },
-                  index: number
-                ) => (
-                  <div key={index} className="message">
-                    {message.text}
+              .map((message, index) => {
+                const isFromSelectedUser =
+                  message.user.toString() === selectedUserId.toString();
+
+                return (
+                  <div
+                    key={index}
+                    style={{
+                      textAlign: isFromSelectedUser ? "right" : "left",
+                      color: isFromSelectedUser ? "blue" : "green",
+                      margin: "5px 0",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-block",
+                        backgroundColor: isFromSelectedUser
+                          ? "#cce5ff"
+                          : "#d4edda",
+                        color: isFromSelectedUser ? "#004085" : "#155724",
+                        borderRadius: "8px",
+                        padding: "5px 10px",
+                        maxWidth: "80%",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {message.text}
+                    </span>
                   </div>
-                )
-              )}
+                );
+              })}
           </div>
           <input
             type="text"

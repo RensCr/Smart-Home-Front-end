@@ -187,21 +187,33 @@ function Index() {
               borderBottom: "1px solid #ccc",
             }}
           >
-            {messages.map(
-              (
-                message: { user: string; recipientId: string; text: string },
-                index: number
-              ) => (
+            {messages.map((message, index) => {
+              const isManager = message.recipientId === "manager";
+              return (
                 <div
                   key={index}
-                  className={`message ${
-                    message.user === userId ? "left" : "right"
-                  }`}
+                  style={{
+                    textAlign: isManager ? "left" : "right",
+                    color: isManager ? "green" : "blue",
+                    margin: "5px 0",
+                  }}
                 >
-                  {message.text}
+                  <span
+                    style={{
+                      display: "inline-block",
+                      backgroundColor: isManager ? "#d4edda" : "#cce5ff",
+                      color: isManager ? "#155724" : "#004085",
+                      borderRadius: "8px",
+                      padding: "5px 10px",
+                      maxWidth: "80%",
+                      wordWrap: "break-word",
+                    }}
+                  >
+                    {message.text}
+                  </span>
                 </div>
-              )
-            )}
+              );
+            })}
           </div>
           <div>
             <input
