@@ -1,7 +1,14 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-import Index from "./pages";
+import Index from "./pages/index";
 import Toevoegen from "./pages/Toevoegen";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
+import Aanmaak from "./pages/Accountaanmaak";
+import Huizen from "./pages/Huizen";
+import Account from "./pages/Account";
+import SlimmeApparaten from "./pages/SlimmeApparaten";
+import Plattegrond from "./pages/Plattegrond";
+import Manager from "./pages/manager";
 
 function App() {
   return (
@@ -9,6 +16,13 @@ function App() {
       <Routes>
         <Route path="" element={<Index />} />
         <Route path="/toevoegen" element={<Toevoegen />} />
+        <Route path="/Aanmelden" element={<Aanmaak />} />
+        <Route path="/Inloggen" element={<Login />} />
+        <Route path="/Huizen" element={<Huizen />} />
+        <Route path="/Account" element={<Account />} />
+        <Route path="/Slimmeapparaten" element={<SlimmeApparaten />} />
+        <Route path="/Plattegrond" element={<Plattegrond />} />
+        <Route path="/manager" element={<Manager />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
