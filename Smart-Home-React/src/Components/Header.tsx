@@ -84,6 +84,18 @@ function Header({
                 Apparaat Toevoegen
               </Link>
             </li>
+            <li className="nav-item">
+              <span className="nav-link">|</span>
+            </li>
+            <li className="nav-item">
+              <Link
+                className="nav-link active"
+                aria-current="page"
+                to="/plattegrond"
+              >
+                Plattegrond
+              </Link>
+            </li>
           </ul>
           <form className="d-flex">
             <input

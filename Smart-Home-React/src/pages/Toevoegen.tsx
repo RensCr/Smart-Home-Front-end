@@ -95,7 +95,12 @@ const Toevoegen = () => {
 
   return (
     <div>
-      <Header searchQuery="" setSearchQuery={() => {}} />
+      <Header
+        searchQuery=""
+        setSearchQuery={() => {}}
+        setUsername={() => {}}
+        setUserId={() => {}}
+      />
       <div className="container mt-5">
         <div className="card shadow-sm">
           <div className="card-body">

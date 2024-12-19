@@ -14,8 +14,8 @@ const Helpdesk = () => {
   } = useWebSocket();
   const [newMessage, setNewMessage] = useState("");
   const [chatOpen, setChatOpen] = useState(true);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const [selectedUserId, setSelectedUserId] = useState(null);
+  const [selectedUser, setSelectedUser] = useState<string | null>(null);
+  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
 
   useEffect(() => {
     if (selectedUser && selectedUserId) {
@@ -53,20 +53,22 @@ const Helpdesk = () => {
       <div className="user-list">
         <h2>Users</h2>
         <ul>
-          {users.map((user, index) => (
-            <li
-              key={index}
-              onClick={() => {
-                console.log("User clicked:", user);
-                setSelectedUser(user.username);
-                setSelectedUserId(user.userId);
-                console.log("Selected user:", user);
-                TriggerGroupChat(user);
-              }}
-            >
-              {user.username}
-            </li>
-          ))}
+          {users.map(
+            (user: { username: string; userId: string }, index: number) => (
+              <li
+                key={index}
+                onClick={() => {
+                  console.log("User clicked:", user);
+                  setSelectedUser(user.username);
+                  setSelectedUserId(user.userId);
+                  console.log("Selected user:", user);
+                  TriggerGroupChat(user);
+                }}
+              >
+                {user.username}
+              </li>
+            )
+          )}
         </ul>
       </div>
 
@@ -88,6 +90,7 @@ const Helpdesk = () => {
                   recipientId: string;
                   text: string;
                 }) => {
+                  if (!selectedUserId) return false;
                   const isSelectedUser =
                     message.recipientId.toString() ===
                       selectedUserId.toString() ||
@@ -106,37 +109,43 @@ const Helpdesk = () => {
                   return isSelectedUser;
                 }
               )
-              .map((message, index) => {
-                const isFromSelectedUser =
-                  message.user.toString() === selectedUserId.toString();
+              .map(
+                (
+                  message: { user: string; recipientId: string; text: string },
+                  index: number
+                ) => {
+                  const isFromSelectedUser =
+                    selectedUserId &&
+                    message.user.toString() === selectedUserId.toString();
 
-                return (
-                  <div
-                    key={index}
-                    style={{
-                      textAlign: isFromSelectedUser ? "right" : "left",
-                      color: isFromSelectedUser ? "blue" : "green",
-                      margin: "5px 0",
-                    }}
-                  >
-                    <span
+                  return (
+                    <div
+                      key={index}
                       style={{
-                        display: "inline-block",
-                        backgroundColor: isFromSelectedUser
-                          ? "#cce5ff"
-                          : "#d4edda",
-                        color: isFromSelectedUser ? "#004085" : "#155724",
-                        borderRadius: "8px",
-                        padding: "5px 10px",
-                        maxWidth: "80%",
-                        wordWrap: "break-word",
+                        textAlign: isFromSelectedUser ? "right" : "left",
+                        color: isFromSelectedUser ? "blue" : "green",
+                        margin: "5px 0",
                       }}
                     >
-                      {message.text}
-                    </span>
-                  </div>
-                );
-              })}
+                      <span
+                        style={{
+                          display: "inline-block",
+                          backgroundColor: isFromSelectedUser
+                            ? "#cce5ff"
+                            : "#d4edda",
+                          color: isFromSelectedUser ? "#004085" : "#155724",
+                          borderRadius: "8px",
+                          padding: "5px 10px",
+                          maxWidth: "80%",
+                          wordWrap: "break-word",
+                        }}
+                      >
+                        {message.text}
+                      </span>
+                    </div>
+                  );
+                }
+              )}
           </div>
           <input
             type="text"

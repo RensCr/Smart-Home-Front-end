@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import { Stage, Layer, Rect, Text, Image } from "react-konva";
 import Swal from "sweetalert2";
+import Header from "../Components/Header";
 
 interface Rectangle {
   id?: number;
@@ -228,26 +229,6 @@ const Plattegrond: React.FC = () => {
     setIsDrawing(false);
   };
 
-  // const handleRectangleClick = (index: number) => {
-  //   // const stage = stageRef.current;
-  //   // const pointerPosition = stage.getPointerPosition();
-  //   // const mouseX = (pointerPosition.x - stage.x()) / scale;
-  //   // const mouseY = (pointerPosition.y - stage.y()) / scale;
-
-  //   // const rect = rooms[index];
-
-  //   // // You could check distances here based on the transformed mouse coordinates
-  //   // const isInside =
-  //   //   mouseX >= rect.x &&
-  //   //   mouseX <= rect.x + rect.width &&
-  //   //   mouseY >= rect.y &&
-  //   //   mouseY <= rect.y + rect.height;
-
-  //   // if (isInside) {
-  //   //   setSelectedRectangleIndex(index);
-  //   // }
-  //   setSelectedRectangleIndex(index);
-  // };
   const handleRectangleClick = (index: number) => {
     setSelectedRectangleIndex(index);
     setSelectedDeviceIndex(null); // Deselect any selected device
@@ -274,18 +255,6 @@ const Plattegrond: React.FC = () => {
       setRooms(updatedRooms);
       historyRef.current.push(updatedRooms);
     }
-  };
-  // ... your existing imports and code above this line
-  // Utility function to check if a device is within any room
-  const isDeviceInsideRoom = (device: Rectangle, rooms: Rectangle[]) => {
-    return rooms.some((room) => {
-      return (
-        device.x >= room.x &&
-        device.x + device.width <= room.x + room.width &&
-        device.y >= room.y &&
-        device.y + device.height <= room.y + room.height
-      );
-    });
   };
 
   const handleDeleteKeyPress = (e: KeyboardEvent) => {
@@ -397,12 +366,10 @@ const Plattegrond: React.FC = () => {
   };
   const isOverlapping = (rect1: Rectangle, rect2: Rectangle) => {
     return !(
-      (
-        rect1.x + rect1.width <= rect2.x || // rect1 is to the left of rect2
-        rect1.x >= rect2.x + rect2.width || // rect1 is to the right of rect2
-        rect1.y + rect1.height <= rect2.y || // rect1 is above rect2
-        rect1.y >= rect2.y + rect2.height
-      ) // rect1 is below rect2
+      rect1.x + rect1.width <= rect2.x ||
+      rect1.x >= rect2.x + rect2.width ||
+      rect1.y + rect1.height <= rect2.y ||
+      rect1.y >= rect2.y + rect2.height
     );
   };
   const handleDeviceDrop = (device: Apparaat, x: number, y: number) => {
@@ -443,14 +410,10 @@ const Plattegrond: React.FC = () => {
     setApparaten((prevApparaten) =>
       prevApparaten.map((d) => (d.id === device.id ? updatedDevice : d))
     );
-
-    console.log("Apparaat geplaatst in kamer met ID:", containingRoom.id);
   };
 
   // useEffect om `rooms` wijzigingen te loggen en te bevestigen
-  useEffect(() => {
-    console.log("rooms state gewijzigd:", rooms);
-  }, [rooms]);
+  useEffect(() => {}, [rooms]);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -481,17 +444,10 @@ const Plattegrond: React.FC = () => {
     // Retrieve the device data from the drag event
     const deviceData = e.dataTransfer.getData("device");
     if (!deviceData) {
-      console.log("Device data niet gevonden bij het droppen.");
       return;
     }
 
     const device = JSON.parse(deviceData);
-
-    console.log(
-      "Pointer positie (getransformeerd):",
-      transformedPointerPosition
-    );
-    console.log("Device Data:", device);
 
     // Add the device at the calculated, transformed position
     handleDeviceDrop(
@@ -500,23 +456,25 @@ const Plattegrond: React.FC = () => {
       transformedPointerPosition.y
     );
   };
-  // const handleDeviceClick = (device: Apparaat, event: React.MouseEvent) => {
-  //   const rect = event.target.getBoundingClientRect();
-  //   setSelectedDevice(device);
-  //   setPopupPosition({
-  //     top: rect.top - 60, // Adjust as needed
-  //     left: rect.left,
-  //   });
-  // };
+  const [searchQuery, setSearchQuery] = useState("");
+
+  const filteredApparaten = apparaten.filter((device) =>
+    device.naam.toLowerCase().includes(searchQuery.toLowerCase())
+  );
 
   return (
     <>
-      <h1 style={{ margin: "0 0 1vw 3vw", fontSize: "1.5em" }}>Plattegrond</h1>
-      <div style={{ display: "flex", height: "100vh" }}>
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setUsername={() => {}}
+        setUserId={() => {}}
+      />
+      <div style={{ display: "flex", height: "100vh", marginTop: "3vh" }}>
         <div
           style={{
             width: "75vw",
-            height: "calc(100vh - 5vw)",
+            height: "calc(100vh - 10vw)",
             margin: "0vw 0 5vw 1vw",
             padding: "0",
             overflow: "hidden",
@@ -613,7 +571,7 @@ const Plattegrond: React.FC = () => {
         <div
           style={{
             width: "20vw",
-            height: "calc(100vh - 5vw)",
+            height: "calc(100vh - 10vw)",
             margin: "0 0 5vw 0",
             padding: "1vw",
             overflowY: "scroll",
@@ -622,7 +580,7 @@ const Plattegrond: React.FC = () => {
           }}
         >
           <h2>Apparaten</h2>
-          {apparaten.map((device) => (
+          {filteredApparaten.map((device) => (
             <div
               key={device.id}
               draggable={isEditing}

@@ -7,7 +7,15 @@ import Footer from "../Components/Footer";
 function Index() {
   const navigate = useNavigate();
   const { messages, sendMessage, connectUser, currentUser } = useWebSocket();
-  const [Apparaten, setApparaattypes] = useState([]);
+  interface ApparatenType {
+    id: number;
+    naam: string;
+    apparaatType: string;
+    slim: boolean;
+    status: boolean;
+  }
+
+  const [Apparaten, setApparaattypes] = useState<ApparatenType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [isChatOpen, setIsChatOpen] = useState(false);
   const [newMessage, setNewMessage] = useState("");
@@ -77,6 +85,74 @@ function Index() {
       (query === "niet slim" && !apparaat.slim)
     );
   });
+  const VerranderStatus = async (apparaatId: number, status: boolean) => {
+    try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("jwtToken="))
+        ?.split("=")[1];
+
+      if (!token) {
+        console.error("JWT token not found in cookies");
+        return;
+      }
+
+      const response = await fetch(
+        `https://localhost:7032/Apparaat/verranderStatus`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ apparaatId, status }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to update apparaat status");
+        return;
+      }
+
+      fetchApparaten(); // Refresh apparaten list after updating the status
+    } catch (error) {
+      console.error("Error updating apparaat status:", error);
+    }
+  };
+  const VerranderSlim = async (apparaatId: number, status: boolean) => {
+    try {
+      const token = document.cookie
+        .split("; ")
+        .find((row) => row.startsWith("jwtToken="))
+        ?.split("=")[1];
+
+      if (!token) {
+        console.error("JWT token not found in cookies");
+        return;
+      }
+
+      const response = await fetch(
+        `https://localhost:7032/Apparaat/verranderSlim`,
+        {
+          method: "POST",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ apparaatId, status }),
+        }
+      );
+
+      if (!response.ok) {
+        console.error("Failed to update apparaat status");
+        return;
+      }
+
+      fetchApparaten(); // Refresh apparaten list after updating the status
+    } catch (error) {
+      console.error("Error updating apparaat status:", error);
+    }
+  };
 
   const toggleChatWindow = () => {
     setIsChatOpen(!isChatOpen);
@@ -187,33 +263,38 @@ function Index() {
               borderBottom: "1px solid #ccc",
             }}
           >
-            {messages.map((message, index) => {
-              const isManager = message.recipientId === "manager";
-              return (
-                <div
-                  key={index}
-                  style={{
-                    textAlign: isManager ? "left" : "right",
-                    color: isManager ? "green" : "blue",
-                    margin: "5px 0",
-                  }}
-                >
-                  <span
+            {messages.map(
+              (
+                message: { text: string; recipientId: string },
+                index: number
+              ) => {
+                const isManager = message.recipientId === "manager";
+                return (
+                  <div
+                    key={index}
                     style={{
-                      display: "inline-block",
-                      backgroundColor: isManager ? "#d4edda" : "#cce5ff",
-                      color: isManager ? "#155724" : "#004085",
-                      borderRadius: "8px",
-                      padding: "5px 10px",
-                      maxWidth: "80%",
-                      wordWrap: "break-word",
+                      textAlign: isManager ? "left" : "right",
+                      color: isManager ? "green" : "blue",
+                      margin: "5px 0",
                     }}
                   >
-                    {message.text}
-                  </span>
-                </div>
-              );
-            })}
+                    <span
+                      style={{
+                        display: "inline-block",
+                        backgroundColor: isManager ? "#d4edda" : "#cce5ff",
+                        color: isManager ? "#155724" : "#004085",
+                        borderRadius: "8px",
+                        padding: "5px 10px",
+                        maxWidth: "80%",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {message.text}
+                    </span>
+                  </div>
+                );
+              }
+            )}
           </div>
           <div>
             <input
