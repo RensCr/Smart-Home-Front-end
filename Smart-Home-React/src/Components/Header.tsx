@@ -1,13 +1,25 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useWebSocket } from "../Websocket/websocketcontext.jsx"; // Import WebSocket context
+
 interface HeaderProps {
   searchQuery: string;
   setSearchQuery: (query: string) => void;
+  setUsername: (username: string) => void;
+  setUserId: (userId: string) => void;
 }
 
-function Header({ searchQuery, setSearchQuery }: HeaderProps) {
+function Header({
+  searchQuery,
+  setSearchQuery,
+  setUsername,
+  setUserId,
+}: HeaderProps) {
   const [Gebruikersnaam, setGebruikersnaam] = useState<string>("");
+  const [GebruikersId, setGebruikersId] = useState<string>("");
   const navigate = useNavigate();
+  const { currentUser } = useWebSocket(); // Access currentUser from WebSocket context
+
   useEffect(() => {
     async function fetchUsername() {
       try {
@@ -26,13 +38,16 @@ function Header({ searchQuery, setSearchQuery }: HeaderProps) {
         const data = await response.json();
         console.log("t", data);
         setGebruikersnaam(data.naam);
+        setGebruikersId(data.id);
+        setUsername(data.naam); // Set the username in the parent component
+        setUserId(data.id); // Set the userId in the parent component
       } catch (error) {
         console.error("Error fetching username:", error);
       }
     }
 
     fetchUsername();
-  }, []);
+  }, [setUsername, setUserId]);
 
   function uitloggen() {
     document.cookie =
@@ -69,6 +84,18 @@ function Header({ searchQuery, setSearchQuery }: HeaderProps) {
                 Apparaat Toevoegen
               </Link>
             </li>
+            <li className="nav-item">
+              <span className="nav-link">|</span>
+            </li>
+            <li className="nav-item">
+              <Link
+                className="nav-link active"
+                aria-current="page"
+                to="/plattegrond"
+              >
+                Plattegrond
+              </Link>
+            </li>
           </ul>
           <form className="d-flex">
             <input
@@ -95,7 +122,9 @@ function Header({ searchQuery, setSearchQuery }: HeaderProps) {
               aria-labelledby="dropdownUser1"
             >
               <li>
-                <span className="dropdown-item">{Gebruikersnaam}</span>
+                <span className="dropdown-item">
+                  {currentUser?.username || Gebruikersnaam}
+                </span>
               </li>
               <li>
                 <a className="dropdown-item" href="/account">

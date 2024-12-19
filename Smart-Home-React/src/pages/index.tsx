@@ -1,22 +1,26 @@
-import "../App.css";
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useWebSocket } from "../Websocket/websocketcontext.jsx";
 import Header from "../Components/Header";
 import Footer from "../Components/Footer";
-import "../Css/Home.css";
-import { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
 
 function Index() {
   const navigate = useNavigate();
-  const [Apparaten, setApparaattypes] = useState<
-    {
-      id: number;
-      naam: string;
-      slim: boolean;
-      apparaatType: string;
-      status: boolean;
-    }[]
-  >([]);
+  const { messages, sendMessage, connectUser, currentUser } = useWebSocket();
+  interface ApparatenType {
+    id: number;
+    naam: string;
+    apparaatType: string;
+    slim: boolean;
+    status: boolean;
+  }
+
+  const [Apparaten, setApparaattypes] = useState<ApparatenType[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isChatOpen, setIsChatOpen] = useState(false);
+  const [newMessage, setNewMessage] = useState("");
+  const [username, setUsername] = useState("User");
+  const [userId, setUserId] = useState("");
 
   useEffect(() => {
     const checkJwtToken = () => {
@@ -26,12 +30,6 @@ function Index() {
       );
       if (jwtTokenCookie) {
         console.log("jwtToken cookie found");
-        const isSecure = jwtTokenCookie.includes("Secure");
-        if (isSecure) {
-          console.log("jwtToken cookie is secure");
-        } else {
-          console.log("jwtToken cookie is not secure");
-        }
       } else {
         console.log("jwtToken cookie not found, redirecting to login");
         navigate("/inloggen");
@@ -155,9 +153,29 @@ function Index() {
       console.error("Error updating apparaat status:", error);
     }
   };
+
+  const toggleChatWindow = () => {
+    setIsChatOpen(!isChatOpen);
+    if (!isChatOpen) {
+      connectUser({ username, userId });
+    }
+  };
+
+  const handleSendMessage = () => {
+    if (newMessage.trim()) {
+      sendMessage(newMessage, "manager");
+      setNewMessage("");
+    }
+  };
+
   return (
     <>
-      <Header searchQuery={searchQuery} setSearchQuery={setSearchQuery} />
+      <Header
+        searchQuery={searchQuery}
+        setSearchQuery={setSearchQuery}
+        setUsername={setUsername}
+        setUserId={setUserId}
+      />
       <div className="container-fluid">
         <div className="row">
           {filteredApparaten.map((apparaat) => (
@@ -200,6 +218,110 @@ function Index() {
           ))}
         </div>
       </div>
+
+      <div
+        className="chat-bubble"
+        onClick={toggleChatWindow}
+        style={{
+          position: "fixed",
+          bottom: "70px",
+          right: "20px",
+          backgroundColor: "#007bff",
+          color: "white",
+          borderRadius: "50%",
+          padding: "15px",
+          cursor: "pointer",
+          boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+          fontSize: "20px",
+        }}
+      >
+        💬
+      </div>
+
+      {isChatOpen && (
+        <div
+          className="chat-window"
+          style={{
+            position: "fixed",
+            bottom: "100px",
+            right: "20px",
+            width: "300px",
+            height: "400px",
+            backgroundColor: "white",
+            borderRadius: "8px",
+            boxShadow: "0 4px 6px rgba(0, 0, 0, 0.2)",
+            padding: "10px",
+            zIndex: 1000,
+          }}
+        >
+          <h5>Chat</h5>
+          <div
+            className="chat-content"
+            style={{
+              height: "300px",
+              overflowY: "scroll",
+              borderBottom: "1px solid #ccc",
+            }}
+          >
+            {messages.map(
+              (
+                message: { text: string; recipientId: string },
+                index: number
+              ) => {
+                const isManager = message.recipientId === "manager";
+                return (
+                  <div
+                    key={index}
+                    style={{
+                      textAlign: isManager ? "left" : "right",
+                      color: isManager ? "green" : "blue",
+                      margin: "5px 0",
+                    }}
+                  >
+                    <span
+                      style={{
+                        display: "inline-block",
+                        backgroundColor: isManager ? "#d4edda" : "#cce5ff",
+                        color: isManager ? "#155724" : "#004085",
+                        borderRadius: "8px",
+                        padding: "5px 10px",
+                        maxWidth: "80%",
+                        wordWrap: "break-word",
+                      }}
+                    >
+                      {message.text}
+                    </span>
+                  </div>
+                );
+              }
+            )}
+          </div>
+          <div>
+            <input
+              type="text"
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Type a message..."
+              style={{ width: "100%", padding: "5px" }}
+            />
+            <button
+              onClick={handleSendMessage}
+              style={{
+                marginTop: "10px",
+                width: "100%",
+                padding: "5px",
+                backgroundColor: "#007bff",
+                color: "white",
+                border: "none",
+                borderRadius: "4px",
+              }}
+            >
+              Send
+            </button>
+          </div>
+        </div>
+      )}
+
       <Footer />
     </>
   );
